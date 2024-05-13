@@ -1,7 +1,7 @@
 # Software Engineering Project
 
 
-# How to run
+# How to get started
 
 - You will have to install Flutter SDK (just google and download)
 - Then you need to install Android SDK (Its a while new IDE but we wont have to use it, you just need it for the emulator)
@@ -16,18 +16,18 @@ When you run it, you first have to start the emulator and then just type "flutte
 
 # carbon_tracker
 
-A new Flutter project.
+**This representes the client side of the application (Flutter)**
 
-## Getting Started
 
-This project is a starting point for a Flutter application.
+# carbon_tracker_server
 
-A few resources to get you started if this is your first Flutter project:
+**This represents the server side of the applicaiton (Java, APIs, SQL)
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+# How to run the application
+
+- Start an emulator: *>Flutter: laund emulator*
+- In the terminal: *flutter run*
+
+
 
