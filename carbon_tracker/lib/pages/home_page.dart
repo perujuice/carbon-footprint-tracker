@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'login_page.dart';
 
 
-
+// This is the main page of the app. It is the first page that the user sees when they open the app.
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
 
