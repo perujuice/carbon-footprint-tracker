@@ -28,6 +28,7 @@ When you run it, you first have to start the emulator and then just type "flutte
 
 - Start an emulator: *>Flutter: laund emulator*
 - In the terminal: *flutter run*
+- cd into the server folder and run *"gradle bootRun"* to run the server side.
 
 
 
