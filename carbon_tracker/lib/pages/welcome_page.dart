@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_calendar_carousel/flutter_calendar_carousel.dart';
 import 'goal_page.dart';
 import 'help_page.dart';
@@ -23,6 +22,8 @@ class _WelcomePageState extends State<WelcomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
+      // This is the top green bar with the title and settings icon.
       appBar: AppBar(
         title: const Text('Welcome User!'),
         backgroundColor: Colors.green,
@@ -54,7 +55,7 @@ class _WelcomePageState extends State<WelcomePage> {
         ],
       ),
 
-
+      // This is the calendar that the user can interact with.
       body: Center(
         child: CalendarCarousel(
           onDayPressed: (DateTime date, List<dynamic> events) {
@@ -70,7 +71,7 @@ class _WelcomePageState extends State<WelcomePage> {
         ),
       ),
 
-
+      // This is the bottom navigation bar that allows the user to navigate to other pages.
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.green,
         items: const <BottomNavigationBarItem>[
@@ -88,9 +89,7 @@ class _WelcomePageState extends State<WelcomePage> {
           ),
         ],
         selectedItemColor: Colors.white,
-        unselectedItemColor: Colors.white.withOpacity(.60),
-        selectedFontSize: 14,
-        unselectedFontSize: 14,
+        unselectedItemColor: Colors.white,
         onTap: (index) {
           switch (index) {
             case 0:
