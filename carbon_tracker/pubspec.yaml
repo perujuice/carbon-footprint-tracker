@@ -31,6 +31,8 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_calendar_carousel: ^2.0.2
+  # For http requests to comunication with the backend.
+  http: ^0.13.3
 
 
   # The following adds the Cupertino Icons font to your application.

@@ -4,8 +4,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 import org.json.JSONObject;
 
+
+// Just for testing the distance calculation API
 public class DistanceCalculator {
 
+    // This is my personal API key, be careful to not overuse it haha
+    // I think I will be charged after like 30,000 requests or something, Ill keep track tho.
     private static final String API_KEY = "AIzaSyDS2lRR6DHeikTjmx9QNykRVkguSzanfSg";
 
     public static double getDistance(String start, String end) {
@@ -24,13 +28,5 @@ public class DistanceCalculator {
         double distanceInKilometers = distanceInMeters / 1000;
     
         return distanceInKilometers;
-    }
-
-
-    public static void main(String[] args) {
-        String start = "Stockholm,Sweden";
-        String end = "Gothenburg,Sweden";
-        double distance = getDistance(start, end);
-        System.out.println("The distance from " + start + " to " + end + " is " + distance + " Km.");
     }
 }

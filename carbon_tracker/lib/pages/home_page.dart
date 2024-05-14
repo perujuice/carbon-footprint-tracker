@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'login_page.dart';
 import 'goal_page.dart';
 import 'help_page.dart';
+import 'package:http/http.dart' as http;
 
 
 // This is the main page of the app. It is the first page that the user sees when they open the app.
@@ -16,35 +17,30 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   List<String> stops = ['Departure Location', 'Destination Location'];
+  List<String> inputs = ['', ''];
+  String distance = '';
+
+  // This function gets the distance between two locations.
+  Future<void> getDistance(String start, String end) async {
+    // The IP address, localhost wont work on the emulator since it is running on a different machine.
+    final response = await http.get(Uri.parse('http://10.0.2.2:8080/getDistance?start=$start&end=$end'));
+
+    if (response.statusCode == 200) {
+      setState(() {
+        distance = response.body;
+      });
+    } else {
+      throw Exception('Failed to get distance');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // this signifies the top bar of the app
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
-        actions: <Widget>[
-          PopupMenuButton<String>(
-            icon: const Icon(Icons.menu), 
-            onSelected: (String result) {
-              // Handle your action
-            },
-            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-              const PopupMenuItem<String>(
-                value: 'Action1',
-                child: Text('Action 1'),
-              ),
-              const PopupMenuItem<String>(
-                value: 'Action2',
-                child: Text('Action 2'),
-              ),
-            ],
-          ),
-        ],
       ),
-
-      // This is for the input boxes in the center of the home screen.
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -66,6 +62,9 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                     child: TextField(
                       textAlign: TextAlign.center,
+                      onChanged: (value) {
+                        inputs[index] = value;
+                      },
                       decoration: InputDecoration(
                         hintText: stops[index],
                         border: InputBorder.none,
@@ -75,18 +74,26 @@ class _MyHomePageState extends State<MyHomePage> {
                 },
               ),
             ),
+            Text('Distance: $distance km'),
+            ElevatedButton(
+              onPressed: () {
+                getDistance(inputs[0], inputs[1]);
+              },
+              child: Text('Submit'),
+            ),
             Column(
-        children: [
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () {
-              setState(() {
-                stops.insert(stops.length - 1, 'Stop ${stops.length - 1}');
-              });
-            },
-          ),
-          const Text('Add Stop'),
-        ],
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.add),
+                  onPressed: () {
+                    setState(() {
+                      stops.insert(stops.length - 1, 'Stop ${stops.length - 1}');
+                      inputs.add('');
+                    });
+                  },
+                ),
+                const Text('Add Stop'),
+              ],
             ),
           ],
         ),
