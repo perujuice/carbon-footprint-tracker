@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_calendar_carousel/flutter_calendar_carousel.dart';
 import 'goal_page.dart';
 import 'help_page.dart';
-import 'info_page.dart';
+import 'user_info.dart';
 import 'settings_page.dart';
 
 

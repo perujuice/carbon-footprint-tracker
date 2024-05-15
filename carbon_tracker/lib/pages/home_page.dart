@@ -1,6 +1,6 @@
+import 'package:carbon_tracker/pages/info_page.dart';
 import 'package:flutter/material.dart';
 import 'login_page.dart';
-import 'goal_page.dart';
 import 'help_page.dart';
 import 'package:http/http.dart' as http;
 
@@ -124,7 +124,7 @@ class _MyHomePageState extends State<MyHomePage> {
             case 0:
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const GoalPage()),
+                MaterialPageRoute(builder: (context) => const InfoPage()),
               );
               break;
             case 1:
