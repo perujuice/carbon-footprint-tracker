@@ -4,24 +4,31 @@ import 'goal_page.dart';
 import 'help_page.dart';
 import 'user_info.dart';
 import 'settings_page.dart';
+import 'transport_mode.dart';
 
 
-// This is the first page the user sees after logging in. 
-// It displays a calendar and allows the user to set goals, 
+
+
+// This is the first page the user sees after logging in.
+// It displays a calendar and allows the user to set goals,
 //view information about the app, and get help.
 class WelcomePage extends StatefulWidget {
   const WelcomePage({super.key, required this.title});
 
+
   final String title;
+
 
   @override
   State<WelcomePage> createState() => _WelcomePageState();
 }
 
+
 class _WelcomePageState extends State<WelcomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
 
       // This is the top green bar with the title and settings icon.
       appBar: AppBar(
@@ -41,7 +48,9 @@ class _WelcomePageState extends State<WelcomePage> {
                     var end = Offset.zero;
                     var curve = Curves.ease;
 
+
                     var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
 
                     return SlideTransition(
                       position: animation.drive(tween),
@@ -55,10 +64,15 @@ class _WelcomePageState extends State<WelcomePage> {
         ],
       ),
 
+
       // This is the calendar that the user can interact with.
       body: Center(
         child: CalendarCarousel(
           onDayPressed: (DateTime date, List<dynamic> events) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ModePage(date: date)),
+            );
           },
           weekendTextStyle: const TextStyle(
             color: Colors.red,
@@ -70,6 +84,7 @@ class _WelcomePageState extends State<WelcomePage> {
           daysHaveCircularBorder: false,
         ),
       ),
+
 
       // This is the bottom navigation bar that allows the user to navigate to other pages.
       bottomNavigationBar: BottomNavigationBar(
@@ -112,9 +127,12 @@ class _WelcomePageState extends State<WelcomePage> {
               break;
           }
         }
-        
+       
       )
     );
   }
 
+
 }
+
+
