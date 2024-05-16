@@ -1,0 +1,28 @@
+-- Users table
+CREATE TABLE Users (
+    id BIGINT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    goalId BIGINT,
+    FOREIGN KEY (goalId) REFERENCES Goals(id)
+);
+
+-- Goals table
+CREATE TABLE Goals (
+    id BIGINT PRIMARY KEY,
+    co2Output DOUBLE NOT NULL,
+    period VARCHAR(255) NOT NULL,
+    userId BIGINT UNIQUE,
+    FOREIGN KEY (userId) REFERENCES Users(id)
+);
+
+-- Trips table
+CREATE TABLE Trips (
+    id BIGINT PRIMARY KEY,
+    startLocation VARCHAR(255) NOT NULL,
+    endLocation VARCHAR(255) NOT NULL,
+    distance DOUBLE NOT NULL,
+    mode VARCHAR(50) NOT NULL,
+    co2Output DOUBLE NOT NULL,
+    userId BIGINT,
+    FOREIGN KEY (userId) REFERENCES Users(id)
+);

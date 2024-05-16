@@ -1,23 +1,45 @@
 package com.carbon.server.model;
 
-public class User {
-    private Long id;
-    private String name;
-    private Goal goal;
-    private Trip trip;
+import jakarta.persistence.*;
+import java.util.List;
 
-    // Constructor
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
+@Entity
+@Table(name = "app_user") // Change table name to avoid reserved keyword
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+
+
+public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
+    private Long id;
+
+    private String name;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "goal_id")
+    @JsonManagedReference
+    private Goal goal;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private List<Trip> trips;
+
+    // Constructors, getters, and setters
     public User() {
     }
 
-    public User(Long id, String name, Goal goal, Trip trip) {
+    public User(Long id, String name, Goal goal, List<Trip> trips) {
         this.id = id;
         this.name = name;
         this.goal = goal;
-        this.trip = trip;
+        this.trips = trips;
     }
 
-    // Getters and Setters
     public Long getId() {
         return id;
     }
@@ -42,12 +64,12 @@ public class User {
         this.goal = goal;
     }
 
-    public Trip getTrip() {
-        return trip;
+    public List<Trip> getTrips() {
+        return trips;
     }
 
-    public void setTrip(Trip trip) {
-        this.trip = trip;
+    public void setTrips(List<Trip> trips) {
+        this.trips = trips;
     }
 
     @Override
@@ -56,7 +78,7 @@ public class User {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", goal=" + goal +
-                ", trip=" + trip +
+                ", trips=" + trips +
                 '}';
     }
 }

@@ -1,19 +1,39 @@
-// Goal.java
 package com.carbon.server.model;
 
-public class Goal {
-    private Long id;
-    private double co2Output;
-    private Period period;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
-    // Constructor
-    public Goal(Long id, double co2Output, Period period) {
+import jakarta.persistence.*;
+
+@Entity
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+
+public class Goal {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "goal_id")
+
+    private Long id;
+
+    private double co2Output;
+    private String period;
+
+    @OneToOne(mappedBy = "goal", cascade = CascadeType.ALL)
+    @JsonBackReference
+    private User user;
+
+    // Constructors, getters, and setters
+    public Goal() {
+    }
+
+    public Goal(Long id, double co2Output, String period, User user) {
         this.id = id;
         this.co2Output = co2Output;
         this.period = period;
+        this.user = user;
     }
 
-    // Getters and Setters
     public Long getId() {
         return id;
     }
@@ -30,12 +50,20 @@ public class Goal {
         this.co2Output = co2Output;
     }
 
-    public Period getPeriod() {
+    public String getPeriod() {
         return period;
     }
 
-    public void setPeriod(Period period) {
+    public void setPeriod(String period) {
         this.period = period;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     @Override
@@ -43,7 +71,8 @@ public class Goal {
         return "Goal{" +
                 "id=" + id +
                 ", co2Output=" + co2Output +
-                ", period=" + period +
+                ", period='" + period + '\'' +
+                ", user=" + user +
                 '}';
     }
 }
