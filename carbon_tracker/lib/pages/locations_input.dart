@@ -27,8 +27,8 @@ class _LocationInputPageState extends State<LocationInputPage> {
 
 
   Future<String> getDistance(String start, String end, String mode) async {
+  try {
     final response = await http.get(Uri.parse('http://10.0.2.2:8080/getDistance?start=$start&end=$end&mode=$mode'));
-
 
     if (response.statusCode == 200) {
       setState(() {
@@ -36,9 +36,13 @@ class _LocationInputPageState extends State<LocationInputPage> {
       });
       return response.body;
     } else {
-      throw Exception('Failed to get distance');
+      throw Exception('Failed to get distance. Status code: ${response.statusCode}. Body: ${response.body}');
     }
+  } catch (e) {
+    print('Error getting distance: $e');
+    throw Exception('An error occurred');
   }
+}
 
 
   Future<void> getEmission(String mode, String distance) async {
@@ -69,12 +73,18 @@ class _LocationInputPageState extends State<LocationInputPage> {
   }
 
 
+  // Create a TextEditingController for start and end destinations
+final TextEditingController _startController = TextEditingController();
+final TextEditingController _endController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Enter Locations for ${widget.mode}'),
       ),
+
+      // This is the input form for the locations.
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -95,9 +105,10 @@ class _LocationInputPageState extends State<LocationInputPage> {
                       borderRadius: BorderRadius.circular(20.0),
                     ),
                     child: widget.mode == 'flight' ? TypeAheadField(
-                      textFieldConfiguration: const TextFieldConfiguration(
+                      textFieldConfiguration: TextFieldConfiguration(
                         autofocus: true,
                         decoration: InputDecoration(border: OutlineInputBorder()),
+                        controller: index == 0 ? _startController : _endController, // Set the controller for this TextField
                       ),
                       suggestionsCallback: (pattern) async {
                         return await getAirports(pattern);
@@ -108,7 +119,14 @@ class _LocationInputPageState extends State<LocationInputPage> {
                         );
                       },
                       onSuggestionSelected: (suggestion) {
-                        inputs[index] = suggestion;
+                        // Update the text of the TextField when a suggestion is selected
+                        if (index == 0) {
+                          _startController.text = suggestion;
+                          inputs[index] = suggestion;
+                        } else {
+                          _endController.text = suggestion;
+                          inputs[index] = suggestion;
+                        }
                       },
                     ) : TextField(
                       textAlign: TextAlign.center,
@@ -139,5 +157,3 @@ class _LocationInputPageState extends State<LocationInputPage> {
     );
   }
 }
-
-

@@ -1,44 +1,53 @@
 package com.carbon.server;
 
 
+import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
-
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
-
+import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 
 
 public class DistanceCalculator {
 
 
     private static final String API_KEY = "AIzaSyDS2lRR6DHeikTjmx9QNykRVkguSzanfSg";
+    private static final String carbon_API_KEY = "SFbhbVU5vEAQaKuBqAdXg";
 
 
     // CO2 emission factors in kg per kilometer
     private static final double CAR_EMISSION_FACTOR = 0.12;
     private static final double RAIL_EMISSION_FACTOR = 0.06;
     private static final double BUS_EMISSION_FACTOR = 0.08;
-    private static final double FLIGHT_EMISSION_FACTOR = 0.18;
+    private static Map<String, Double> flightData = new HashMap<>();
 
 
     public static double getDistance(String start, String end, String mode) {
         String url;
-        if (mode.equals("rail")) {
+        if (mode.equals("flight")) {
+            flightData = getFlightEmissionAndDistance(start, end);
+            return flightData.getOrDefault("distance", 0.0);
+        } else if (mode.equals("rail")) {
             url = String.format("https://maps.googleapis.com/maps/api/directions/json?origin=%s&destination=%s&mode=transit&transit_mode=rail&key=%s", start, end, API_KEY);
         } else {
             url = String.format("https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=%s&destinations=%s&mode=%s&key=%s", start, end, mode, API_KEY);
         }
-
-
+    
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
-
-
+    
         JSONObject jsonObject = new JSONObject(response.getBody());
         double distanceInMeters = jsonObject.getJSONArray("rows")
                 .getJSONObject(0)
@@ -46,11 +55,9 @@ public class DistanceCalculator {
                 .getJSONObject(0)
                 .getJSONObject("distance")
                 .getDouble("value");
-
-
+    
         return distanceInMeters / 1000;
     }
-
 
 
 
@@ -64,7 +71,7 @@ public class DistanceCalculator {
         } else if (mode.equals("bus")) {
             emissionFactor = BUS_EMISSION_FACTOR;
         } else if (mode.equals("flight")) {
-            emissionFactor = FLIGHT_EMISSION_FACTOR;
+            return flightData.getOrDefault("carbon_kg", 0.0);
         } else {
             throw new IllegalArgumentException("Invalid mode: " + mode);
         }
@@ -77,43 +84,73 @@ public class DistanceCalculator {
 
 
     // The idea here is to get the airports from the input string.
-    // This is not working as expected. The API is not returning the airports.
-    // It is returning the cities.
-    // The idea is to get the airports so that the user doesnt have to type the full name of the airport.
+    // The airports are stored in a CSV file.
+    // The CSV file is read and the airports are filtered based on the input string.
     public static List<String> getAirports(String input) {
-        String url = String.format("https://maps.googleapis.com/maps/api/place/autocomplete/json?input=%s&types=(establishment)&keyword=airport&key=%s", input, API_KEY);
-
-
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
-
-
-        JSONObject jsonObject = new JSONObject(response.getBody());
-        JSONArray predictions = jsonObject.getJSONArray("predictions");
-
-
         List<String> airports = new ArrayList<>();
-        for (int i = 0; i < predictions.length(); i++) {
-            airports.add(predictions.getJSONObject(i).getString("description"));
+    
+        try (BufferedReader reader = new BufferedReader(new FileReader("src/main/java/com/carbon/server/airports.csv"))) {
+            String line = reader.readLine(); // read the first line with column names
+            String[] columnNames = line.split(",");
+    
+            while ((line = reader.readLine()) != null) {
+                String[] fields = line.split(",");
+                Map<String, String> airport = new HashMap<>();
+                for (int i = 0; i < columnNames.length && i < fields.length; i++) {
+                    airport.put(columnNames[i].replace("\"", ""), fields[i].replace("\"", ""));
+                }
+    
+                String city = airport.get("city");
+                String name = airport.get("name");
+    
+                if (city != null && city.toLowerCase().contains(input.toLowerCase()) ||
+                    name != null && name.toLowerCase().contains(input.toLowerCase())) {
+                    String result = String.format("%s, %s, %s", airport.get("code"), city, name);
+                    airports.add(result);
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Error getting airports: " + e.getMessage());
+            e.printStackTrace();
         }
-
-
+    
         return airports;
     }
 
 
-    /*
-    public double getFlightDistance(String start, String end) {
-        String url = String.format("https://api.aviationstack.com/v1/distances?access_key=%s&origin=%s&destination=%s", API_KEY, start, end);
-   
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
-   
-        JSONObject jsonObject = new JSONObject(response.getBody());
-        double distanceInKilometers = jsonObject.getDouble("distance");
-   
-        return distanceInKilometers;
-    }*/
+    public static Map<String, Double> getFlightEmissionAndDistance(String start, String end) {
+        try {
+            String url = "https://www.carboninterface.com/api/v1/estimates";
+    
+            RestTemplate restTemplate = new RestTemplate();
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.set("Authorization", "Bearer " + carbon_API_KEY);
+    
+            JSONObject requestBody = new JSONObject();
+            requestBody.put("type", "flight");
+            requestBody.put("passengers", 1);
+            requestBody.put("legs", new JSONArray()
+                .put(new JSONObject()
+                    .put("departure_airport", start)
+                    .put("destination_airport", end)));
+    
+            HttpEntity<String> request = new HttpEntity<>(requestBody.toString(), headers);
+            ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
+    
+            JSONObject jsonObject = new JSONObject(response.getBody()).getJSONObject("data").getJSONObject("attributes");
+    
+            Map<String, Double> result = new HashMap<>();
+            result.put("carbon_kg", jsonObject.getDouble("carbon_kg"));
+            result.put("distance", jsonObject.getDouble("distance_value"));
+    
+            return result;
+        } catch (Exception e) {
+            System.out.println("Error getting flight emission and distance: " + e.getMessage());
+            e.printStackTrace();
+            return Collections.emptyMap();
+        }
+    }
 
 
     /*
