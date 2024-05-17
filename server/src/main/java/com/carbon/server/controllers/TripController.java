@@ -21,6 +21,7 @@ public class TripController {
         return tripRepository.findAll();
     }
 
+
     @GetMapping("/{id}")
     public Optional<Trip> getTripById(@PathVariable Long id) {
         return tripRepository.findById(id);

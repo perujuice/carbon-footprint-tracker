@@ -74,6 +74,22 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 
+        @GetMapping("/{userId}/co2output")
+    public ResponseEntity<Double> getTotalCO2OutputByUserId(@PathVariable Long userId) {
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            List<Trip> trips = user.getTrips();
+            double totalCO2Output = 0;
+            for (Trip trip : trips) {
+                totalCO2Output += trip.getCo2Output();
+            }
+            return new ResponseEntity<>(totalCO2Output, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
 
     /**
      * Get all trips for a user by user ID.
@@ -144,6 +160,28 @@ public class UserController {
             return savedGoal;
         } else {
             return null;
+        }
+    }
+
+    // gpt: add a method to a users goal based on his id
+
+        /**
+     * Get the goal for a user by user ID.
+     * Test in browser: http://localhost:8080/users/1/goal
+     */
+    @GetMapping("/{userId}/goal")
+    public ResponseEntity<Goal> getGoalByUserId(@PathVariable Long userId) {
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            Goal goal = user.getGoal();
+            if (goal != null) {
+                return new ResponseEntity<>(goal, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 }

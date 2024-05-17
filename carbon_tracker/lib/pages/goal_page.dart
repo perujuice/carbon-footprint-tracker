@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class GoalPage extends StatefulWidget {
   const GoalPage({super.key});
@@ -10,9 +12,61 @@ class GoalPage extends StatefulWidget {
 class _GoalPageState extends State<GoalPage> {
   final _goalController = TextEditingController();
   final _dateController = TextEditingController();
+  double _totalCO2Output = 0.0;
 
-  // Replace this with the actual total CO2 output from the database.
-  final _totalCO2Output = 1000;
+  @override
+  void initState() {
+    super.initState();
+    _getTotalCO2Output();
+  }
+
+  Future<void> _getTotalCO2Output() async {
+    const userId = 1; // Replace with actual user ID
+    final url = Uri.parse('http://10.0.2.2:8080/users/$userId/co2output');
+
+    try {
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        setState(() {
+          _totalCO2Output = double.parse(response.body);
+        });
+      } else {
+        print('Failed to load CO2 output');
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
+
+
+  Future<void> _setUserGoal() async {
+    const userId = 1; // Replace with actual user ID
+    final url = Uri.parse('http://10.0.2.2:8080/users/$userId/goal');
+    final goal = {
+      'co2Output': double.parse(_goalController.text),
+      'period': _dateController.text,
+    };
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(goal),
+      );
+
+      if (response.statusCode == 200) {
+        print('Goal set successfully');
+      } else {
+        print('Failed to set goal');
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -62,9 +116,7 @@ class _GoalPageState extends State<GoalPage> {
               ),
               const SizedBox(height: 20),
               ElevatedButton(
-                onPressed: () {
-                  // Process data.
-                },
+                onPressed: _setUserGoal,
                 child: const Text('Set Goal'),
               ),
             ],
