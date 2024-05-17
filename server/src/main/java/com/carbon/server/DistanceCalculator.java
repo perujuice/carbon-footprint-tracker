@@ -28,6 +28,8 @@ public class DistanceCalculator {
 
 
     // CO2 emission factors in kg per kilometer
+    // We have detailed emission calculations for flights but for other modes of transport we use these average values.
+    // This is just to show that we can calculate emissions for different modes of transport.
     private static final double CAR_EMISSION_FACTOR = 0.12;
     private static final double RAIL_EMISSION_FACTOR = 0.06;
     private static final double BUS_EMISSION_FACTOR = 0.08;
@@ -36,11 +38,13 @@ public class DistanceCalculator {
 
     public static double getDistance(String start, String end, String mode) {
         String url;
+        boolean isDirectionsAPI = false;
         if (mode.equals("flight")) {
             flightData = getFlightEmissionAndDistance(start, end);
             return flightData.getOrDefault("distance", 0.0);
-        } else if (mode.equals("rail")) {
-            url = String.format("https://maps.googleapis.com/maps/api/directions/json?origin=%s&destination=%s&mode=transit&transit_mode=rail&key=%s", start, end, API_KEY);
+        } else if (mode.equals("rail") || mode.equals("bus")) {
+            url = String.format("https://maps.googleapis.com/maps/api/directions/json?origin=%s&destination=%s&mode=transit&transit_mode=%s&key=%s", start, end, mode, API_KEY);
+            isDirectionsAPI = true;
         } else {
             url = String.format("https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=%s&destinations=%s&mode=%s&key=%s", start, end, mode, API_KEY);
         }
@@ -49,14 +53,25 @@ public class DistanceCalculator {
         ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
     
         JSONObject jsonObject = new JSONObject(response.getBody());
-        double distanceInMeters = jsonObject.getJSONArray("rows")
+        double distanceInMeters;
+        if (isDirectionsAPI) {
+            distanceInMeters = jsonObject.getJSONArray("routes")
+                .getJSONObject(0)
+                .getJSONArray("legs")
+                .getJSONObject(0)
+                .getJSONObject("distance")
+                .getDouble("value");
+        } else {
+            distanceInMeters = jsonObject.getJSONArray("rows")
                 .getJSONObject(0)
                 .getJSONArray("elements")
                 .getJSONObject(0)
                 .getJSONObject("distance")
                 .getDouble("value");
+        }
     
-        return distanceInMeters / 1000;
+        double distanceInKilometers = distanceInMeters / 1000;
+        return Double.parseDouble(String.format("%.1f", distanceInKilometers));
     }
 
 
@@ -77,7 +92,8 @@ public class DistanceCalculator {
         }
 
 
-        return distanceInKilometers * emissionFactor;
+        double emission = distanceInKilometers * emissionFactor;
+        return Double.parseDouble(String.format("%.1f", emission));
     }
 
 

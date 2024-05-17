@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'welcome_page.dart';
+import 'register_page.dart';
 
 
 // Login page
@@ -69,7 +70,11 @@ class _LoginPageState extends State<LoginPage> {
             TextButton(
               onPressed: () {
                 // Navigate to registration page
-              },
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const RegisterPage()),
+                  );
+                },
               child: const Text('Register'),
             ),
           ],
