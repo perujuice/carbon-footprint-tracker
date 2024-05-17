@@ -7,6 +7,8 @@ import com.carbon.server.repos.TripRepository;
 import com.carbon.server.repos.UserRepository;
 import com.carbon.server.repos.GoalRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -45,8 +47,33 @@ public class UserController {
     public User addUser(@RequestBody Map<String, String> userMap) {
         User user = new User();
         user.setName(userMap.get("name"));
+        user.setPasswordHash(userMap.get("password")); // storing password directly, not recommended
         return userRepository.save(user);
     }
+
+
+    @PostMapping("/login")
+    public ResponseEntity<User> loginUser(@RequestBody Map<String, String> userMap) {
+        String name = userMap.get("name");
+        String password = userMap.get("password");
+
+        // Find the user by name
+        Optional<User> userOptional = userRepository.findByName(name);
+
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+
+            // Compare the plain text password with the stored password
+            if (password.equals(user.getPasswordHash())) {
+                // If the passwords match, return the user
+                return new ResponseEntity<>(user, HttpStatus.OK);
+            }
+        }
+
+        // If the user is not found or the passwords don't match, return an unauthorized status
+        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
+
 
     /**
      * Get all trips for a user by user ID.

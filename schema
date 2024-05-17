@@ -2,6 +2,7 @@
 CREATE TABLE Users (
     id BIGINT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
+    passwordHash VARCHAR(255) NOT NULL,
     goalId BIGINT,
     FOREIGN KEY (goalId) REFERENCES Goals(id)
 );

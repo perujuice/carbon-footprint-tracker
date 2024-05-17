@@ -20,6 +20,9 @@ public class User {
 
     private String name;
 
+    @Column(name = "password_hash")
+    private String passwordHash;
+
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "goal_id")
     @JsonManagedReference
@@ -33,9 +36,10 @@ public class User {
     public User() {
     }
 
-    public User(Long id, String name, Goal goal, List<Trip> trips) {
+    public User(Long id, String name, String passwordHash, Goal goal, List<Trip> trips) {
         this.id = id;
         this.name = name;
+        this.passwordHash = passwordHash;
         this.goal = goal;
         this.trips = trips;
     }
@@ -54,6 +58,14 @@ public class User {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getPasswordHash() {
+        return passwordHash;
+    }
+
+    public void setPasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
     }
 
     public Goal getGoal() {
