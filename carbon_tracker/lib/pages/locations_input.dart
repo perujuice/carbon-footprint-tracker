@@ -73,9 +73,8 @@ class _LocationInputPageState extends State<LocationInputPage> {
   }
 
 
-  // Create a TextEditingController for start and end destinations
-final TextEditingController _startController = TextEditingController();
-final TextEditingController _endController = TextEditingController();
+  final TextEditingController _startController = TextEditingController();
+  final TextEditingController _endController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -107,7 +106,7 @@ final TextEditingController _endController = TextEditingController();
                     child: widget.mode == 'flight' ? TypeAheadField(
                       textFieldConfiguration: TextFieldConfiguration(
                         autofocus: true,
-                        decoration: InputDecoration(border: OutlineInputBorder()),
+                        decoration: const InputDecoration(border: OutlineInputBorder()),
                         controller: index == 0 ? _startController : _endController, // Set the controller for this TextField
                       ),
                       suggestionsCallback: (pattern) async {
@@ -119,13 +118,16 @@ final TextEditingController _endController = TextEditingController();
                         );
                       },
                       onSuggestionSelected: (suggestion) {
-                        // Update the text of the TextField when a suggestion is selected
+                        // Split the suggestion on the comma and take the first element
+                        String airportCode = suggestion.split(',')[0].trim();
+
+                        // Update the text of the TextField with the airport code
                         if (index == 0) {
-                          _startController.text = suggestion;
-                          inputs[index] = suggestion;
+                          _startController.text = airportCode;
+                          inputs[index] = airportCode;
                         } else {
-                          _endController.text = suggestion;
-                          inputs[index] = suggestion;
+                          _endController.text = airportCode;
+                          inputs[index] = airportCode;
                         }
                       },
                     ) : TextField(
@@ -157,3 +159,4 @@ final TextEditingController _endController = TextEditingController();
     );
   }
 }
+

@@ -118,15 +118,21 @@ public class DistanceCalculator {
     }
 
 
-    public static Map<String, Double> getFlightEmissionAndDistance(String start, String end) {
+    /**
+     * Get flight emission and distance from the carbion interface API
+     * This api is very accurate and provides the most accurate data for flight emissions that I could find.
+
+     * @param start Departure airport code.
+     * @param end Destination airport code.
+     * @return A map with the carbon emission in kg and the distance in km.
+     */
+    public static Map<String, Double> getFlightEmissionAndDistance(String start, String end) {  
         try {
-            String url = "https://www.carboninterface.com/api/v1/estimates";
-    
+            String estimatesUrl = "https://www.carboninterface.com/api/v1/estimates";
             RestTemplate restTemplate = new RestTemplate();
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.set("Authorization", "Bearer " + carbon_API_KEY);
-    
+            HttpHeaders estimatesHeaders = new HttpHeaders();
+            estimatesHeaders.setContentType(MediaType.APPLICATION_JSON);
+            estimatesHeaders.set("Authorization", "Bearer " + carbon_API_KEY);
             JSONObject requestBody = new JSONObject();
             requestBody.put("type", "flight");
             requestBody.put("passengers", 1);
@@ -134,12 +140,10 @@ public class DistanceCalculator {
                 .put(new JSONObject()
                     .put("departure_airport", start)
                     .put("destination_airport", end)));
+            HttpEntity<String> estimatesRequest = new HttpEntity<>(requestBody.toString(), estimatesHeaders);
+            ResponseEntity<String> estimatesResponse = restTemplate.postForEntity(estimatesUrl, estimatesRequest, String.class);
     
-            HttpEntity<String> request = new HttpEntity<>(requestBody.toString(), headers);
-            ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
-    
-            JSONObject jsonObject = new JSONObject(response.getBody()).getJSONObject("data").getJSONObject("attributes");
-    
+            JSONObject jsonObject = new JSONObject(estimatesResponse.getBody()).getJSONObject("data").getJSONObject("attributes");
             Map<String, Double> result = new HashMap<>();
             result.put("carbon_kg", jsonObject.getDouble("carbon_kg"));
             result.put("distance", jsonObject.getDouble("distance_value"));
@@ -151,20 +155,5 @@ public class DistanceCalculator {
             return Collections.emptyMap();
         }
     }
-
-
-    /*
-    public double calculateFlightEmission(String start, String end) {
-        String url = String.format("https://api.myclimate.org/mcb.json?access_key=%s&from=%s&to=%s", API_KEY, start, end);
-   
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
-   
-        JSONObject jsonObject = new JSONObject(response.getBody());
-        double emissionInKg = jsonObject.getDouble("co2");
-   
-        return emissionInKg;
-    }*/
-
 
 }
