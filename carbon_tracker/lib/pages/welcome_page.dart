@@ -66,22 +66,39 @@ class _WelcomePageState extends State<WelcomePage> {
 
 
       // This is the calendar that the user can interact with.
-      body: Center(
-        child: CalendarCarousel(
-          onDayPressed: (DateTime date, List<dynamic> events) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => ModePage(date: date)),
-            );
-          },
-          weekendTextStyle: const TextStyle(
-            color: Colors.red,
-          ),
-          thisMonthDayBorderColor: Colors.grey,
-          weekFormat: false,
-          height: 420.0,
-          selectedDateTime: DateTime.now(),
-          daysHaveCircularBorder: false,
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: <Widget>[
+            const Spacer(flex: 1),
+            const Text(
+              'Select date to log a new trip',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 20),
+            Expanded(
+              flex: 5,
+              child: CalendarCarousel(
+                onDayPressed: (DateTime date, List<dynamic> events) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ModePage(date: date)),
+                  );
+                },
+                weekendTextStyle: const TextStyle(
+                  color: Colors.red,
+                ),
+                thisMonthDayBorderColor: Colors.grey,
+                weekFormat: false,
+                height: 420.0,
+                selectedDateTime: DateTime.now(),
+                daysHaveCircularBorder: false,
+              ),
+            ),
+          ],
         ),
       ),
 
@@ -131,8 +148,6 @@ class _WelcomePageState extends State<WelcomePage> {
       )
     );
   }
-
-
 }
 
 
