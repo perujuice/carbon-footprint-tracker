@@ -35,6 +35,7 @@ dependencies:
     sdk: flutter
   flutter_calendar_carousel: ^2.0.2
   flutter_typeahead: ^3.2.1
+  intl: ^0.17.0
   # For http requests to comunication with the backend.
   http: ^0.13.3
 

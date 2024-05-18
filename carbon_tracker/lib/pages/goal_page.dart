@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:intl/intl.dart';
 
 class GoalPage extends StatefulWidget {
   const GoalPage({super.key});
@@ -46,7 +47,7 @@ class _GoalPageState extends State<GoalPage> {
     final url = Uri.parse('http://10.0.2.2:8080/users/$userId/goal');
     final goal = {
       'co2Output': double.parse(_goalController.text),
-      'period': _dateController.text,
+      'targetDate': _dateController.text,
     };
 
     try {
@@ -57,14 +58,20 @@ class _GoalPageState extends State<GoalPage> {
       );
 
       if (response.statusCode == 200) {
-        print('Goal set successfully');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Goal set successfully')),
+        );
       } else {
-        print('Failed to set goal');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to set goal')),
+        );
       }
-    } catch (e) {
-      print('Error: $e');
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('An error occurred while setting the goal')),
+        );
+      }
     }
-  }
 
 
 
@@ -84,7 +91,7 @@ class _GoalPageState extends State<GoalPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               const Text(
-                'Set your goals here!',
+                "Define your CO2 emission limit and strive to stay below it until your specified target date.",
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -100,11 +107,26 @@ class _GoalPageState extends State<GoalPage> {
                 keyboardType: TextInputType.number,
               ),
               const SizedBox(height: 20),
-              TextFormField(
-                controller: _dateController,
-                decoration: const InputDecoration(
-                  labelText: 'Date (yyyy-mm-dd)',
-                  border: OutlineInputBorder(),
+              TextButton(
+                onPressed: () async {
+                  final DateTime? pickedDate = await showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2100),
+                  );
+                  if (pickedDate != null) {
+                    _dateController.text = DateFormat('yyyy-MM-dd').format(pickedDate);
+                  }
+                },
+                child: AbsorbPointer(
+                  child: TextFormField(
+                    controller: _dateController,
+                    decoration: const InputDecoration(
+                      labelText: 'Date (yyyy-mm-dd)',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(height: 20),

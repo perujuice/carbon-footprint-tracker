@@ -17,7 +17,7 @@ public class Goal {
     private Long id;
 
     private double co2Output;
-    private String period;
+    private String targetDate;
 
     @OneToOne(mappedBy = "goal", cascade = CascadeType.ALL)
     @JsonBackReference
@@ -27,10 +27,10 @@ public class Goal {
     public Goal() {
     }
 
-    public Goal(Long id, double co2Output, String period, User user) {
+    public Goal(Long id, double co2Output, String targetDate, User user) {
         this.id = id;
         this.co2Output = co2Output;
-        this.period = period;
+        this.targetDate = targetDate;
         this.user = user;
     }
 
@@ -50,12 +50,12 @@ public class Goal {
         this.co2Output = co2Output;
     }
 
-    public String getPeriod() {
-        return period;
+    public String getTargetDate() {
+        return targetDate;
     }
 
-    public void setPeriod(String period) {
-        this.period = period;
+    public void setPeriod(String targetDate) {
+        this.targetDate = targetDate;
     }
 
     public User getUser() {
@@ -71,7 +71,7 @@ public class Goal {
         return "Goal{" +
                 "id=" + id +
                 ", co2Output=" + co2Output +
-                ", period='" + period + '\'' +
+                ", period='" + targetDate + '\'' +
                 ", user=" + user +
                 '}';
     }

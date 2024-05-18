@@ -146,7 +146,7 @@ public class UserController {
      * Body: { "co2Output": 50.0, "period": "21-08-24, 25-08-24" }
      *
      * cURL command:
-     * curl -X POST -H "Content-Type: application/json" -d '{"co2Output": 50.0, "period": "21-08-24, 25-08-24"}' http://localhost:8080/users/{userId}/goal
+     * curl -X POST -H "Content-Type: application/json" -d '{"co2Output": 50.0, "targetDate": "21-08-24, 25-08-24"}' http://localhost:8080/users/{userId}/goal
      */
     @PostMapping("/{userId}/goal")
     public Goal setGoalForUser(@PathVariable Long userId, @RequestBody Goal goal) {
