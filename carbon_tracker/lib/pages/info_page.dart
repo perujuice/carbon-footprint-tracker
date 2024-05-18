@@ -33,6 +33,7 @@ class _InfoPageState extends State<InfoPage> {
                     ),
                   ),
                   SizedBox(height: 10),
+                  // This is to be replaced by the actual carbon footprint
                   Text(
                     '23.98',
                     style: TextStyle(

@@ -74,7 +74,7 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 
-        @GetMapping("/{userId}/co2output")
+    @GetMapping("/{userId}/co2output")
     public ResponseEntity<Double> getTotalCO2OutputByUserId(@PathVariable Long userId) {
         Optional<User> userOptional = userRepository.findById(userId);
         if (userOptional.isPresent()) {

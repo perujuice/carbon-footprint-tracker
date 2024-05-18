@@ -21,7 +21,7 @@ class _RegisterState extends State<RegisterPage> {
         'Content-Type': 'application/json; charset=UTF-8',
       },
       body: jsonEncode(<String, String>{
-        'username': _usernameController.text,
+        'name': _usernameController.text,
         'password': _passwordController.text,
       }),
     );

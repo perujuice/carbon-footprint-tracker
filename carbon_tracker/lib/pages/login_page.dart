@@ -19,7 +19,7 @@ class _LoginPageState extends State<LoginPage> {
   // (changed by bryan) Method to authenticate the user by making an API call
   Future<void> authenticateUser() async {
     final response = await http.post(
-      Uri.parse('http://10.0.2.2:8080/login'),
+      Uri.parse('http://10.0.2.2:8080/users/login'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
