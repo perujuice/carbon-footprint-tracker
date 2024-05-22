@@ -1,5 +1,7 @@
 package com.carbon.server.model;
 
+import java.sql.Date;
+
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
@@ -10,25 +12,18 @@ import jakarta.persistence.*;
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 
 public class Trip {
-    public enum Mode {
-        DRIVING,
-        WALKING,
-        BICYCLING,
-        TRANSIT
-    }
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "trip_id")
 
     private Long id;
-
     private String startLocation;
     private String endLocation;
     private double distance;
-    @Enumerated(EnumType.STRING)
-    private Mode mode;
+    private String mode;
     private double co2Output;
+    @Column(name = "date")
+    private Date date;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -39,7 +34,7 @@ public class Trip {
     public Trip() {
     }
 
-    public Trip(Long id, String startLocation, String endLocation, double distance, Mode mode, double co2Output, User user) {
+    public Trip(Long id, String startLocation, String endLocation, double distance, String mode, double co2Output, User user, Date date) {
         this.id = id;
         this.startLocation = startLocation;
         this.endLocation = endLocation;
@@ -47,6 +42,7 @@ public class Trip {
         this.mode = mode;
         this.co2Output = co2Output;
         this.user = user;
+        this.date = date;
     }
 
     public Long getId() {
@@ -81,11 +77,11 @@ public class Trip {
         this.distance = distance;
     }
 
-    public Mode getMode() {
+    public String getMode() {
         return mode;
     }
 
-    public void setMode(Mode mode) {
+    public void setMode(String mode) {
         this.mode = mode;
     }
 
@@ -105,6 +101,15 @@ public class Trip {
         this.user = user;
     }
 
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
     @Override
     public String toString() {
         return "Trip{" +
@@ -115,6 +120,7 @@ public class Trip {
                 ", mode=" + mode +
                 ", co2Output=" + co2Output +
                 ", user=" + user +
+                ", date=" + date +
                 '}';
     }
 }

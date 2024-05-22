@@ -95,7 +95,7 @@ public class UserController {
      * Get all trips for a user by user ID.
      * Test in browser: http://localhost:8080/users/{userId}/trips
      */
-    @GetMapping("/{userId}/trips")
+    @GetMapping("/{userId}/getTrips")
     public List<Trip> getTripsByUserId(@PathVariable Long userId) {
         Optional<User> user = userRepository.findById(userId);
         return user.map(User::getTrips).orElse(null);
@@ -107,7 +107,7 @@ public class UserController {
      * POST http://localhost:8080/users/{userId}/trips
      * Body: { "tripDetails": "details here" }
      */
-    @PostMapping("/{userId}/trips")
+    @PostMapping("/{userId}/addTrips")
     public Trip addTripForUser(@PathVariable Long userId, @RequestBody Trip trip) {
         Optional<User> userOptional = userRepository.findById(userId);
         if (userOptional.isPresent()) {
@@ -119,25 +119,6 @@ public class UserController {
         }
     }
 
-    /**
-     * Add multiple trips for a user by user ID.
-     * Test in browser using Postman or similar tool:
-     * POST http://localhost:8080/users/{userId}/trips/all
-     * Body: [ { "tripDetails": "details here" }, { "tripDetails": "details here" } ]
-     */
-    @PostMapping("/{userId}/trips/all")
-    public List<Trip> addTripsForUser(@PathVariable Long userId, @RequestBody List<Trip> trips) {
-        Optional<User> userOptional = userRepository.findById(userId);
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
-            for (Trip trip : trips) {
-                trip.setUser(user);
-            }
-            return (List<Trip>) tripRepository.saveAll(trips);
-        } else {
-            return null;
-        }
-    }
 
     /**
      * Set a goal for a user by user ID.

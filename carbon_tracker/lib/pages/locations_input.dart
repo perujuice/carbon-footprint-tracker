@@ -7,11 +7,10 @@ import 'dart:convert';
 class LocationInputPage extends StatefulWidget {
   final String mode;
   final DateTime? date;
+  final int? userId;
 
 
-
-
-  const LocationInputPage({super.key, required this.mode, this.date});
+  const LocationInputPage({super.key, required this.mode, this.date, this.userId});
 
 
   @override
@@ -20,10 +19,63 @@ class LocationInputPage extends StatefulWidget {
 
 
 class _LocationInputPageState extends State<LocationInputPage> {
+  final TextEditingController _startController = TextEditingController();
+  final TextEditingController _endController = TextEditingController();
   List<String> stops = ['Departure Location', 'Destination Location'];
   List<String> inputs = ['', ''];
   String distance = '';
   String emission = '';
+  
+
+  @override
+  void initState() {
+    super.initState();
+    print('User ID: ${widget.userId}, Type: ${widget.userId.runtimeType}');
+  }
+
+
+  Future<void> _setUserTrip() async {
+    if (widget.userId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('You must be logged in to save a trip')),
+      );
+      return;
+    }
+    
+    final url = Uri.parse('http://10.0.2.2:8080/users/${widget.userId}/addTrips');
+    final trip = {
+      'co2Uutput': double.parse(emission),
+      'distance': double.parse(distance),
+      'startLocation': inputs[0],
+      'endLocation': inputs[1],
+      'mode': widget.mode,
+      'date': widget.date != null ? '${widget.date?.year}-${widget.date?.month.toString().padLeft(2,'0')}-${widget.date?.day.toString().padLeft(2,'0')}' : null,
+    };
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(trip),
+      );
+
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Trip saved successfully')),
+        );
+        Navigator.pushNamedAndRemoveUntil(context, '/welcome', (route) => false);
+      } else {
+        print('Response body: ${response.body}');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to save trip')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('An error occurred while saving the trip')),
+      );
+    }
+  }
 
 
   Future<String> getDistance(String start, String end, String mode) async {
@@ -72,9 +124,6 @@ class _LocationInputPageState extends State<LocationInputPage> {
     }
   }
 
-
-  final TextEditingController _startController = TextEditingController();
-  final TextEditingController _endController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -148,8 +197,15 @@ class _LocationInputPageState extends State<LocationInputPage> {
             Text('CO2 Emission: $emission kg'),
             ElevatedButton(
               onPressed: () async {
-                String distance = await getDistance(inputs[0], inputs[1], widget.mode);
-                await getEmission(widget.mode, distance);
+                if (inputs[0].isNotEmpty && inputs[1].isNotEmpty) {
+                  String distance = await getDistance(inputs[0], inputs[1], widget.mode);
+                  await getEmission(widget.mode, distance);
+                  await _setUserTrip();
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Submission failed')),
+                  );
+                }
               },
               child: const Text('Submit'),
             ),

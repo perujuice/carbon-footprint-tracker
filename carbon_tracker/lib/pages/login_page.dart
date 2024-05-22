@@ -9,7 +9,7 @@ class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
   @override
-  _LoginPageState createState() => _LoginPageState();
+  State<LoginPage> createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
@@ -31,9 +31,13 @@ class _LoginPageState extends State<LoginPage> {
 
     // If the server returns an OK response, navigate to the WelcomePage
     if (response.statusCode == 200) {
+      // Parse the response body to get the user ID
+      final responseBody = jsonDecode(response.body);
+      final userId = responseBody['id']; // Replace 'id' with the actual key for the user ID in the response
+
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => const WelcomePage(title: 'Welcome User!')),
+        MaterialPageRoute(builder: (context) => WelcomePage(title: 'Welcome User!', userId: userId)),
       );
     } else {
       // Otherwise, show a snackbar with the error message

@@ -1,13 +1,51 @@
+import 'package:carbon_tracker/user_provide.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:provider/provider.dart';
 
 class InfoPage extends StatefulWidget {
   const InfoPage({super.key});
 
+  
   @override
   State<InfoPage> createState() => _InfoPageState();
 }
 
+
+
 class _InfoPageState extends State<InfoPage> {
+  double totalCO2Output = 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+    String username = context.read<UserProvider>().username;
+    getTotalCO2Output(int.parse(username)).then((value) {
+      setState(() {
+        totalCO2Output = value;
+      });
+    });
+  }
+
+
+  // Get the total CO2 output of a user from the server.
+  Future<double> getTotalCO2Output(int userId) async {
+    final response = await http.get(Uri.parse('http://10.0.2.2:8080/users//$userId/co2output'));
+
+    if (response.statusCode == 200) {
+      return double.parse(response.body);
+    } else {
+      throw Exception('Failed to load CO2 output');
+    }
+  }
+
+
+
+
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -17,6 +55,7 @@ class _InfoPageState extends State<InfoPage> {
         elevation: 0.0,
         centerTitle: true,
       ),
+
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
@@ -26,7 +65,7 @@ class _InfoPageState extends State<InfoPage> {
               child: Column(
                 children: [
                   Text(
-                    'This is your annual carbon footprint:',
+                    'This is your total carbon footprint this year:',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w500,
@@ -35,6 +74,7 @@ class _InfoPageState extends State<InfoPage> {
                   SizedBox(height: 10),
                   // This is to be replaced by the actual carbon footprint
                   Text(
+                    //'$totalCO2Output',
                     '23.98',
                     style: TextStyle(
                       fontSize: 48,

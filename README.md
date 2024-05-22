@@ -1,6 +1,24 @@
 # Software Engineering Project
 
 
+# Shit that needs to be done:
+*For all pages, user needs to be passed though to keep user session open*
+
+- Goals page:
+    - Show goals if already set
+    - Prompt a new goal
+    - If no goal prompt to set a goal
+- Transport mode page:
+    - Seperate for logged in user
+- Locations page:
+    - When going back as a logged in user it should go back to the welcome page
+- Help page:
+    - Just something there
+- Info Pages need to be fixed
+
+
+
+
 # How to get started
 
 - You will have to install Flutter SDK (just google and download)

@@ -1,10 +1,14 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_calendar_carousel/classes/event.dart';
 import 'package:flutter_calendar_carousel/flutter_calendar_carousel.dart';
 import 'goal_page.dart';
 import 'help_page.dart';
 import 'user_info.dart';
 import 'settings_page.dart';
 import 'transport_mode.dart';
+import 'package:http/http.dart' as http;
 
 
 
@@ -13,11 +17,10 @@ import 'transport_mode.dart';
 // It displays a calendar and allows the user to set goals,
 //view information about the app, and get help.
 class WelcomePage extends StatefulWidget {
-  const WelcomePage({super.key, required this.title});
-
+  const WelcomePage({super.key, required this.title, required this.userId});
 
   final String title;
-
+  final int userId;
 
   @override
   State<WelcomePage> createState() => _WelcomePageState();
@@ -25,6 +28,39 @@ class WelcomePage extends StatefulWidget {
 
 
 class _WelcomePageState extends State<WelcomePage> {
+  late Future<List<Map<String, dynamic>>> tripDates;
+
+  @override
+  void initState() {
+    super.initState();
+    tripDates = fetchTripData();
+  }
+
+  Future<List<Map<String, dynamic>>> fetchTripData() async {
+    final response = await http.get(
+      Uri.parse('http://10.0.2.2:8080/users/${widget.userId}/getTrips'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        // You might need to add an Authorization header here if your API requires it
+      },
+    );
+
+    if (response.statusCode == 200) {
+      // If the server returns a 200 OK response, parse the JSON.
+      List<dynamic> jsonResponse = jsonDecode(response.body);
+      print('Trip data: $jsonResponse'); // Print the trip data
+      return jsonResponse.map((item) => {
+        'date': DateTime.parse(item['date']),
+        'startLocation': item['startLocation'],
+        'endLocation': item['endLocation'],
+      }).toList();
+    } else {
+      // If the server returns an error response, throw an exception.
+      throw Exception('Failed to load trip data');
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -79,24 +115,59 @@ class _WelcomePageState extends State<WelcomePage> {
               ),
             ),
             const SizedBox(height: 20),
-            Expanded(
-              flex: 5,
-              child: CalendarCarousel(
-                onDayPressed: (DateTime date, List<dynamic> events) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => ModePage(date: date)),
+            FutureBuilder<List<Map<String, dynamic>>>(
+              future: tripDates,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return Expanded(
+                    flex: 5,
+                    child: CalendarCarousel(
+                      onDayPressed: (DateTime date, List<dynamic> events) {
+                        var trip = snapshot.data!.firstWhere(
+                          (trip) => DateTime(trip['date'].year, trip['date'].month, trip['date'].day) == DateTime(date.year, date.month, date.day), 
+                          orElse: () => {'date': date, 'startLocation': null, 'endLocation': null},
+                        );
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => ModePage(
+                            date: date,
+                            userId: widget.userId, 
+                            isLoggedIn: true,
+                            startLocation: trip['startLocation'],
+                            endLocation: trip['endLocation'],
+                          )),
+                        );
+                      },
+                      weekendTextStyle: const TextStyle(
+                        color: Colors.red,
+                      ),
+                      thisMonthDayBorderColor: Colors.grey,
+                      weekFormat: false,
+                      height: 420.0,
+                      selectedDateTime: DateTime.now(),
+                      daysHaveCircularBorder: false,
+                      markedDatesMap: EventList<Event>(
+                        events: { for (var item in snapshot.data!) item['date'] : [Event(date: item['date'], title: 'Travel')] },
+                      ),
+                      markedDateShowIcon: true,
+                      markedDateIconMaxShown: 1,
+                      markedDateIconBuilder: (event) {
+                        return Container(
+                          decoration: const BoxDecoration(
+                            color: Colors.blue,
+                            shape: BoxShape.circle,
+                          ),
+                        );
+                      },
+                    ),
                   );
-                },
-                weekendTextStyle: const TextStyle(
-                  color: Colors.red,
-                ),
-                thisMonthDayBorderColor: Colors.grey,
-                weekFormat: false,
-                height: 420.0,
-                selectedDateTime: DateTime.now(),
-                daysHaveCircularBorder: false,
-              ),
+                } else if (snapshot.hasError) {
+                  return Text('${snapshot.error}');
+                }
+
+                // By default, show a loading spinner.
+                return const CircularProgressIndicator();
+              },
             ),
           ],
         ),
@@ -149,5 +220,4 @@ class _WelcomePageState extends State<WelcomePage> {
     );
   }
 }
-
 

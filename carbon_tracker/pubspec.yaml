@@ -38,6 +38,7 @@ dependencies:
   intl: ^0.17.0
   # For http requests to comunication with the backend.
   http: ^0.13.3
+  provider: ^6.0.1
 
 
 
