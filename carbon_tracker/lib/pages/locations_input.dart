@@ -45,7 +45,7 @@ class _LocationInputPageState extends State<LocationInputPage> {
     
     final url = Uri.parse('http://10.0.2.2:8080/users/${widget.userId}/addTrips');
     final trip = {
-      'co2Uutput': double.parse(emission),
+      'co2output': double.parse(emission),
       'distance': double.parse(distance),
       'startLocation': inputs[0],
       'endLocation': inputs[1],

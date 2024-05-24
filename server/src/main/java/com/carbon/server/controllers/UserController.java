@@ -15,6 +15,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Map;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+
+
+
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -74,15 +79,31 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 
-    @GetMapping("/{userId}/co2output")
-    public ResponseEntity<Double> getTotalCO2OutputByUserId(@PathVariable Long userId) {
+
+    /**
+     * Get total CO2 output for a user by user ID based on date criteria.
+     * Test in terminal:
+     * curl -X GET http://localhost:8080/users/1/co2output/past
+     * Replace {userId} with the actual user ID and {type} with "past", "future", or "all"
+     */
+    @GetMapping("/{userId}/co2output/{type}")
+    public ResponseEntity<Double> getTotalCO2OutputByUserId(@PathVariable Long userId, @PathVariable String type) {
         Optional<User> userOptional = userRepository.findById(userId);
         if (userOptional.isPresent()) {
             User user = userOptional.get();
             List<Trip> trips = user.getTrips();
             double totalCO2Output = 0;
+            LocalDate currentDate = LocalDate.now();
+    
             for (Trip trip : trips) {
-                totalCO2Output += trip.getCo2Output();
+                LocalDate tripDate = trip.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                if ("past".equals(type) && tripDate.isBefore(currentDate)) {
+                    totalCO2Output += trip.getCo2Output();
+                } else if ("future".equals(type) && tripDate.isAfter(currentDate)) {
+                    totalCO2Output += trip.getCo2Output();
+                } else if ("all".equals(type)) {
+                    totalCO2Output += trip.getCo2Output();
+                }
             }
             return new ResponseEntity<>(totalCO2Output, HttpStatus.OK);
         } else {
