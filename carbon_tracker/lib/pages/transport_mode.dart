@@ -90,7 +90,7 @@ Widget build(BuildContext context) {
             );
             break;
           case 1:
-            if (widget.isLoggedIn) {
+            if (!widget.isLoggedIn) {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const LoginPage()),

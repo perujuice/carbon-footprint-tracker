@@ -1,4 +1,3 @@
-import 'package:carbon_tracker/pages/info_page.dart';
 import 'package:flutter/material.dart';
 import 'login_page.dart';
 import 'help_page.dart';

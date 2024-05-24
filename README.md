@@ -5,7 +5,7 @@
 
 2. **Install Android SDK**
    - Download and install the Android SDK.
-   - Note: You will need the Android SDK for the emulator, even though you won't be using the IDE directly.
+   - Note: You will need the Android SDK for the emulator, even though you won't need IDE directly to run the application (can be done in vsCode).
 
 3. **Add Flutter to Path**
    - Ensure that Flutter is added to your system path so that the `flutter` commands work properly.
@@ -17,17 +17,8 @@
      - Extract the zipped file to `users/YourUsername/AppData/local/Android/sdk`.
      - Follow any additional commands provided by `flutter doctor` to resolve issues.
 
-5. **Running the Application**
-   - Start the emulator.
-   - In the terminal, type `flutter run`.
-
-## carbon_tracker
-
-**This represents the client side of the application (Flutter).**
-
-## server
-
-**This represents the server side of the application (Java, APIs, SQL).**
+5. **Install the Spring boot SDK**
+- The app relies on the dependencies and funtionalities provided by spring boot to run.
 
 # How to Run the Application
 
@@ -35,10 +26,11 @@
    - Use the command `Flutter: launch emulator` in your development environment.
 
 2. **Start the Server**:
-   - Navigate to the server folder using `cd server`.
+   - Navigate to the server folder using:  `cd server`.
    - Run the server with the command `gradle bootRun`.
 
 3. **Run the Application**:
+   - Navigate to the client side with: `cd carbon_tracker`.
    - In the terminal, execute `flutter run`.
 
 

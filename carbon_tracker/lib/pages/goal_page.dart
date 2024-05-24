@@ -4,7 +4,8 @@ import 'dart:convert';
 import 'package:intl/intl.dart';
 
 class GoalPage extends StatefulWidget {
-  const GoalPage({super.key});
+  final int userId;
+  const GoalPage({super.key, required this.userId});
 
   @override
   State<GoalPage> createState() => _GoalPageState();
@@ -13,33 +14,26 @@ class GoalPage extends StatefulWidget {
 class _GoalPageState extends State<GoalPage> {
   final _goalController = TextEditingController();
   final _dateController = TextEditingController();
-  double _totalCO2Output = 0.0;
+  late double _totalCO2Output = 0.0;
 
   @override
   void initState() {
     super.initState();
-    _getTotalCO2Output();
+    fetchTotalCO2Output();
   }
 
-  Future<void> _getTotalCO2Output() async {
-    const userId = 1; // Replace with actual user ID
-    final url = Uri.parse('http://10.0.2.2:8080/users/$userId/co2output');
 
-    try {
-      final response = await http.get(url);
+  Future<void> fetchTotalCO2Output() async {
+    final response = await http.get(Uri.parse('http://10.0.2.2:8080/users/${widget.userId}/co2output/past'));
 
-      if (response.statusCode == 200) {
-        setState(() {
-          _totalCO2Output = double.parse(response.body);
-        });
-      } else {
-        print('Failed to load CO2 output');
-      }
-    } catch (e) {
-      print('Error: $e');
+    if (response.statusCode == 200) {
+      setState(() {
+        _totalCO2Output = double.parse(response.body);
+      });
+    } else {
+      throw Exception('Failed to fetch total CO2 output');
     }
   }
-
 
 
   Future<void> _setUserGoal() async {
@@ -84,25 +78,150 @@ class _GoalPageState extends State<GoalPage> {
         elevation: 0.0,
         centerTitle: true,
       ),
-      body: Center(
+      body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Text(
-                'Your total CO2 output from all trips is $_totalCO2Output kg',
-                style: const TextStyle(
-                  fontSize: 16,
+              const Padding(
+                padding: EdgeInsets.all(20.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Center(
+                      child: Column(
+                        children: [
+                          Text(
+                            'This is your total carbon footprint this year:',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          SizedBox(height: 10),
+                          // This is to be replaced by the actual carbon footprint
+                          Text(
+                            //'$totalCO2Output',
+                            '23.98',
+                            style: TextStyle(
+                              fontSize: 48,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            'Tons CO2e',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 30),
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 3,
+                          child: Text(
+                            'You',
+                            style: TextStyle(
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          flex: 7,
+                          child: LinearProgressIndicator(
+                            value: 1.0,
+                            backgroundColor: Colors.grey,
+                            valueColor: AlwaysStoppedAnimation<Color>(Colors.yellow),
+                          ),
+                        ),
+                        SizedBox(width: 10),
+                        Text(
+                          '23.98 Tons',
+                          style: TextStyle(
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 3,
+                          child: Text(
+                            'Avg Sweden',
+                            style: TextStyle(
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          flex: 7,
+                          child: LinearProgressIndicator(
+                            value: 19.49 / 23.98,
+                            backgroundColor: Colors.grey,
+                            valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                          ),
+                        ),
+                        SizedBox(width: 10),
+                        Text(
+                          '19.49 Tons',
+                          style: TextStyle(
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 3,
+                          child: Text(
+                            'Avg World',
+                            style: TextStyle(
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          flex: 7,
+                          child: LinearProgressIndicator(
+                            value: 4.51 / 23.98,
+                            backgroundColor: Colors.grey,
+                            valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                          ),
+                        ),
+                        SizedBox(width: 10),
+                        Text(
+                          '4.51 Tons',
+                          style: TextStyle(
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 30),
+                    Center(
+                      child: Text(
+                        "You're 23% above the national average.",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    SizedBox(height: 30),
+                  ],
                 ),
               ),
-              const SizedBox(height: 20),
-              const Text(
-                'Average annual CO2 emission per capita: ', // Add the actual value here
-                style: TextStyle(
-                  fontSize: 16,
-                ),
-              ),
+
               const SizedBox(height: 20),
               const Text(
                 "Define your CO2 emission limit and strive to stay below it until your specified target date.",

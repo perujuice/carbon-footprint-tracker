@@ -29,12 +29,17 @@ class WelcomePage extends StatefulWidget {
 class _WelcomePageState extends State<WelcomePage> {
   late Future<List<Map<String, dynamic>>> tripDates;
   double _progress = 0.0; // This should be the user's progress towards their goal
+  double totalCO2Output = 0.0;
+  late Future<double>  totalCO2OutputFuture;
+  late Future<double> goalFuture;
 
 
   @override
   void initState() {
     super.initState();
     tripDates = fetchTripData();
+    totalCO2OutputFuture = fetchTotalCO2Output();
+    goalFuture = fetchGoal(); 
   }
 
   Future<List<Map<String, dynamic>>> fetchTripData() async {
@@ -60,6 +65,39 @@ class _WelcomePageState extends State<WelcomePage> {
       throw Exception('Failed to load trip data');
     }
   }
+
+
+  Future<double> fetchTotalCO2Output() async {
+    final response = await http.get(Uri.parse('http://10.0.2.2:8080/users/${widget.userId}/co2output/past'));
+
+    if (response.statusCode == 200) {
+      double totalCO2Output = double.parse(response.body);
+      double goal = await goalFuture;
+      _progress = totalCO2Output / goal;
+      return totalCO2Output;
+    } else {
+      throw Exception('Failed to fetch total CO2 output');
+    }
+  }
+
+
+  Future<double> fetchGoal() async {
+  final response = await http.get(Uri.parse('http://10.0.2.2:8080/users/${widget.userId}/goal'));
+
+  if (response.statusCode == 200) {
+    Map<String, dynamic> goalData = jsonDecode(response.body);
+    if (goalData.containsKey('goal') && goalData['goal'] != null) {
+      double goal = double.parse(goalData['goal'].toString());
+      return goal;
+    } else {
+      throw Exception('Goal value is not found or null');
+    }
+  } else {
+    throw Exception('Failed to fetch goal');
+  }
+}
+
+
 
 
   @override
@@ -105,21 +143,50 @@ class _WelcomePageState extends State<WelcomePage> {
       // This is the calendar that the user can interact with.
       body: Padding(
         padding: const EdgeInsets.all(8.0),
-      child: Column(
-        children: <Widget>[
-          const Text(
-            'Your progress towards your goal',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+        child: Column(
+          children: <Widget>[
+            FutureBuilder<double>(
+              future: totalCO2OutputFuture,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return Text(
+                    'Total CO2 Output: ${snapshot.data} kg',
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  );
+                } else if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                }
+                // By default, show a loading spinner.
+                return const CircularProgressIndicator();
+              },
             ),
-          ),
-          LinearProgressIndicator(
-            value: _progress,
-            backgroundColor: Colors.grey,
-            valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
-          ),
-          Text('${(_progress * 100).toStringAsFixed(1)}%'),
+            FutureBuilder<double>(
+              future: goalFuture,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return Text(
+                    'Your goal: ${snapshot.data} kg',
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  );
+                } else if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                }
+                // By default, show a loading spinner.
+                return const CircularProgressIndicator();
+              },
+            ),
+            LinearProgressIndicator(
+              value: _progress,
+              backgroundColor: Colors.grey,
+              valueColor: const AlwaysStoppedAnimation<Color>(Colors.green),
+            ),
+            Text('${(_progress * 100).toStringAsFixed(1)}%'),
           const SizedBox(height: 20),
           const Text(
             'Select date to log a new trip',
@@ -212,7 +279,7 @@ class _WelcomePageState extends State<WelcomePage> {
             case 0:
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const GoalPage()),
+                MaterialPageRoute(builder: (context) => GoalPage(userId: widget.userId,)),
               );
               break;
             case 1:
