@@ -96,7 +96,7 @@ public class UserController {
             LocalDate currentDate = LocalDate.now();
     
             for (Trip trip : trips) {
-                LocalDate tripDate = trip.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                LocalDate tripDate = trip.getDate().toLocalDate();  // Use toLocalDate() instead of toInstant().atZone(...)
                 if ("past".equals(type) && tripDate.isBefore(currentDate)) {
                     totalCO2Output += trip.getCo2Output();
                 } else if ("future".equals(type) && tripDate.isAfter(currentDate)) {
