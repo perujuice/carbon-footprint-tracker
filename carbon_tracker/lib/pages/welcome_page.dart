@@ -5,11 +5,10 @@ import 'package:flutter_calendar_carousel/classes/event.dart';
 import 'package:flutter_calendar_carousel/flutter_calendar_carousel.dart';
 import 'goal_page.dart';
 import 'help_page.dart';
-import 'user_info.dart';
+import 'info_page.dart';
 import 'settings_page.dart';
 import 'transport_mode.dart';
 import 'package:http/http.dart' as http;
-
 
 
 
@@ -29,6 +28,8 @@ class WelcomePage extends StatefulWidget {
 
 class _WelcomePageState extends State<WelcomePage> {
   late Future<List<Map<String, dynamic>>> tripDates;
+  double _progress = 0.0; // This should be the user's progress towards their goal
+
 
   @override
   void initState() {
@@ -104,16 +105,29 @@ class _WelcomePageState extends State<WelcomePage> {
       // This is the calendar that the user can interact with.
       body: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: <Widget>[
-            const Spacer(flex: 1),
-            const Text(
-              'Select date to log a new trip',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+      child: Column(
+        children: <Widget>[
+          const Text(
+            'Your progress towards your goal',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
             ),
+          ),
+          LinearProgressIndicator(
+            value: _progress,
+            backgroundColor: Colors.grey,
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+          ),
+          Text('${(_progress * 100).toStringAsFixed(1)}%'),
+          const SizedBox(height: 20),
+          const Text(
+            'Select date to log a new trip',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
             const SizedBox(height: 20),
             FutureBuilder<List<Map<String, dynamic>>>(
               future: tripDates,
@@ -153,8 +167,8 @@ class _WelcomePageState extends State<WelcomePage> {
                       markedDateIconMaxShown: 1,
                       markedDateIconBuilder: (event) {
                         return Container(
-                          decoration: const BoxDecoration(
-                            color: Colors.blue,
+                          decoration: BoxDecoration(
+                            color: event.date.isBefore(DateTime.now()) ? Colors.red : Colors.blue,
                             shape: BoxShape.circle,
                           ),
                         );
@@ -204,7 +218,7 @@ class _WelcomePageState extends State<WelcomePage> {
             case 1:
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const InfoPage()),
+                MaterialPageRoute(builder: (context) => InfoPage(userId: widget.userId,)),
               );
               break;
             case 2:

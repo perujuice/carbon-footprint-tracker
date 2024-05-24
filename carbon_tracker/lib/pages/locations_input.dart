@@ -1,3 +1,4 @@
+import 'package:carbon_tracker/pages/welcome_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:http/http.dart' as http;
@@ -63,7 +64,11 @@ class _LocationInputPageState extends State<LocationInputPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Trip saved successfully')),
         );
-        Navigator.pushNamedAndRemoveUntil(context, '/welcome', (route) => false);
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => WelcomePage(title: 'Welcome User!', userId: widget.userId!)),
+          (route) => false,
+        );
       } else {
         print('Response body: ${response.body}');
         ScaffoldMessenger.of(context).showSnackBar(

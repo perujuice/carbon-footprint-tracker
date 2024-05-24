@@ -90,6 +90,20 @@ class _GoalPageState extends State<GoalPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
+              Text(
+                'Your total CO2 output from all trips is $_totalCO2Output kg',
+                style: const TextStyle(
+                  fontSize: 16,
+                ),
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                'Average annual CO2 emission per capita: ', // Add the actual value here
+                style: TextStyle(
+                  fontSize: 16,
+                ),
+              ),
+              const SizedBox(height: 20),
               const Text(
                 "Define your CO2 emission limit and strive to stay below it until your specified target date.",
                 style: TextStyle(
@@ -127,13 +141,6 @@ class _GoalPageState extends State<GoalPage> {
                       border: OutlineInputBorder(),
                     ),
                   ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              Text(
-                'Your total CO2 output from all trips is $_totalCO2Output kg',
-                style: const TextStyle(
-                  fontSize: 16,
                 ),
               ),
               const SizedBox(height: 20),

@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 
-class InfoPage extends StatefulWidget {
-  const InfoPage({super.key});
+class InfoPageBasic extends StatefulWidget {
+  const InfoPageBasic({super.key});
 
 
   @override
-  State<InfoPage> createState() => _InfoPageState();
+  State<InfoPageBasic> createState() => _InfoPageState();
 }
 
-class _InfoPageState extends State<InfoPage> {
+class _InfoPageState extends State<InfoPageBasic> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Information Page for the user!'),
+        title: const Text('Generic educational information!'),
         backgroundColor: Colors.green,
         elevation: 0.0,
         centerTitle: true,

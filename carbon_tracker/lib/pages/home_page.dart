@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'login_page.dart';
 import 'help_page.dart';
 import 'transport_mode.dart';
+import 'info_page_basic.dart';
 
 
 
@@ -87,7 +88,7 @@ class _MyHomePageState extends State<MyHomePage> {
             case 0:
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const InfoPage()),
+                MaterialPageRoute(builder: (context) => const InfoPageBasic()),
               );
               break;
             case 1:

@@ -25,8 +25,6 @@ class ModePage extends StatefulWidget {
 class _ModePageState extends State<ModePage> {
   @override
 Widget build(BuildContext context) {
-  print('Date: ${widget.startLocation}'); // Add this line
-
 
   return Scaffold(
     appBar: AppBar(
@@ -88,7 +86,7 @@ Widget build(BuildContext context) {
           case 0:
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const InfoPage()),
+              MaterialPageRoute(builder: (context) => InfoPage(userId: widget.userId,)),
             );
             break;
           case 1:

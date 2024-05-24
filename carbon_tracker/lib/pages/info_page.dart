@@ -1,11 +1,10 @@
-import 'package:carbon_tracker/user_provide.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'package:provider/provider.dart';
+
 
 class InfoPage extends StatefulWidget {
-  const InfoPage({super.key});
+  final int? userId; // Add this line
+  const InfoPage({super.key, required this.userId});
 
   
   @override
@@ -16,17 +15,6 @@ class InfoPage extends StatefulWidget {
 
 class _InfoPageState extends State<InfoPage> {
   double totalCO2Output = 0.0;
-
-  @override
-  void initState() {
-    super.initState();
-    String username = context.read<UserProvider>().username;
-    getTotalCO2Output(int.parse(username)).then((value) {
-      setState(() {
-        totalCO2Output = value;
-      });
-    });
-  }
 
 
   // Get the total CO2 output of a user from the server.
@@ -39,11 +27,6 @@ class _InfoPageState extends State<InfoPage> {
       throw Exception('Failed to load CO2 output');
     }
   }
-
-
-
-
-
 
 
   @override
