@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'package:percent_indicator/percent_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_calendar_carousel/classes/event.dart';
 import 'package:flutter_calendar_carousel/flutter_calendar_carousel.dart';
@@ -73,7 +73,9 @@ class _WelcomePageState extends State<WelcomePage> {
     if (response.statusCode == 200) {
       double totalCO2Output = double.parse(response.body);
       double goal = await goalFuture;
-      _progress = totalCO2Output / goal;
+      setState(() {
+        _progress = totalCO2Output / goal;
+      });
       return totalCO2Output;
     } else {
       throw Exception('Failed to fetch total CO2 output');
@@ -82,20 +84,21 @@ class _WelcomePageState extends State<WelcomePage> {
 
 
   Future<double> fetchGoal() async {
-  final response = await http.get(Uri.parse('http://10.0.2.2:8080/users/${widget.userId}/goal'));
+    final response = await http.get(
+      Uri.parse('http://10.0.2.2:8080/users/${widget.userId}/goal'));
 
-  if (response.statusCode == 200) {
-    Map<String, dynamic> goalData = jsonDecode(response.body);
-    if (goalData.containsKey('goal') && goalData['goal'] != null) {
-      double goal = double.parse(goalData['goal'].toString());
-      return goal;
+    if (response.statusCode == 200) {
+      Map<String, dynamic> goalData = jsonDecode(response.body);
+      if (goalData.containsKey('co2Output') && goalData['co2Output'] != null) {
+        double goal = double.parse(goalData['co2Output'].toString());
+        return goal;
+      } else {
+        throw Exception('Goal value is not found or null');
+      }
     } else {
-      throw Exception('Goal value is not found or null');
+      throw Exception('Failed to fetch goal');
     }
-  } else {
-    throw Exception('Failed to fetch goal');
   }
-}
 
 
 
@@ -107,7 +110,7 @@ class _WelcomePageState extends State<WelcomePage> {
 
       // This is the top green bar with the title and settings icon.
       appBar: AppBar(
-        title: const Text('Welcome User!'),
+        title: const Text('Welcome!'),
         backgroundColor: Colors.green,
         elevation: 0.0,
         centerTitle: true,
@@ -150,7 +153,7 @@ class _WelcomePageState extends State<WelcomePage> {
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   return Text(
-                    'Total CO2 Output: ${snapshot.data} kg',
+                    'Total CO2 Output: ${snapshot.data!.toStringAsFixed(1)} kg',
                     style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -181,21 +184,39 @@ class _WelcomePageState extends State<WelcomePage> {
                 return const CircularProgressIndicator();
               },
             ),
-            LinearProgressIndicator(
-              value: _progress,
-              backgroundColor: Colors.grey,
-              valueColor: const AlwaysStoppedAnimation<Color>(Colors.green),
+            Container(
+              padding: EdgeInsets.zero,
+              margin: EdgeInsets.zero,
+              child: CircularPercentIndicator(
+                radius: 60.0, // Adjust this value to change the size of the indicator
+                lineWidth: 13.0, // Adjust this value to change the thickness of the progress bar
+                animation: true,
+                percent: _progress / 100,
+                center: Text(
+                  '${(_progress).toStringAsFixed(1)}%',
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0),
+                ),
+                header: const Text(
+                  "Your progress",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17.0),
+                ),
+                circularStrokeCap: CircularStrokeCap.round,
+                progressColor: Colors.green,
+              ),
             ),
-            Text('${(_progress * 100).toStringAsFixed(1)}%'),
-          const SizedBox(height: 20),
-          const Text(
-            'Select date to log a new trip',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+
+
+          const Padding(
+            padding: EdgeInsets.only(top: 15.0), // Adjust this value to move the text down
+            child: Text(
+              'Select date to log a new trip',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 5),
             FutureBuilder<List<Map<String, dynamic>>>(
               future: tripDates,
               builder: (context, snapshot) {

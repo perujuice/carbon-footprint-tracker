@@ -68,10 +68,9 @@ class _LocationInputPageState extends State<LocationInputPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Trip saved successfully')),
         );
-        Navigator.pushAndRemoveUntil(
+        Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => WelcomePage(title: 'Welcome User!', userId: widget.userId!)),
-          (route) => false,
         );
       } else {
         print('Response body: ${response.body}');
