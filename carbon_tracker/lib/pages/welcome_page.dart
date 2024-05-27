@@ -5,7 +5,7 @@ import 'package:flutter_calendar_carousel/classes/event.dart';
 import 'package:flutter_calendar_carousel/flutter_calendar_carousel.dart';
 import 'goal_page.dart';
 import 'help_page.dart';
-import 'info_page.dart';
+import 'info_page_basic.dart';
 import 'settings_page.dart';
 import 'transport_mode.dart';
 import 'package:http/http.dart' as http;
@@ -126,9 +126,7 @@ class _WelcomePageState extends State<WelcomePage> {
                     var end = Offset.zero;
                     var curve = Curves.ease;
 
-
                     var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-
 
                     return SlideTransition(
                       position: animation.drive(tween),
@@ -151,7 +149,7 @@ class _WelcomePageState extends State<WelcomePage> {
             FutureBuilder<double>(
               future: totalCO2OutputFuture,
               builder: (context, snapshot) {
-                if (snapshot.hasData) {
+                if (snapshot.hasData && snapshot.data! > 0.0) {
                   return Text(
                     'Total CO2 Output: ${snapshot.data!.toStringAsFixed(1)} kg',
                     style: const TextStyle(
@@ -159,55 +157,77 @@ class _WelcomePageState extends State<WelcomePage> {
                       fontWeight: FontWeight.bold,
                     ),
                   );
+                } else if (snapshot.data == 0.0 || snapshot.data == null) {
+                  return const Text(
+                    'No data available for total CO2 output',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  );
                 } else if (snapshot.hasError) {
-                  return Text('Error: ${snapshot.error}');
+                  return Text('${snapshot.error}');
                 }
+
                 // By default, show a loading spinner.
                 return const CircularProgressIndicator();
               },
             ),
+
             FutureBuilder<double>(
               future: goalFuture,
               builder: (context, snapshot) {
-                if (snapshot.hasData) {
+                if (snapshot.hasData && snapshot.data! > 0.0) {
                   return Text(
-                    'Your goal: ${snapshot.data} kg',
+                    'Try to stay under: ${snapshot.data} kg',
                     style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
                   );
                 } else if (snapshot.hasError) {
-                  return Text('Error: ${snapshot.error}');
+                  return Container();
                 }
                 // By default, show a loading spinner.
                 return const CircularProgressIndicator();
               },
             ),
-            Container(
-              padding: EdgeInsets.zero,
-              margin: EdgeInsets.zero,
-              child: CircularPercentIndicator(
-                radius: 60.0, // Adjust this value to change the size of the indicator
-                lineWidth: 13.0, // Adjust this value to change the thickness of the progress bar
-                animation: true,
-                percent: _progress / 100,
-                center: Text(
-                  '${(_progress).toStringAsFixed(1)}%',
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0),
-                ),
-                header: const Text(
-                  "Your progress",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17.0),
-                ),
-                circularStrokeCap: CircularStrokeCap.round,
-                progressColor: Colors.green,
+
+
+            Flexible(
+              flex: 3,
+              child: Container(
+                padding: EdgeInsets.zero,
+                margin: EdgeInsets.zero,
+                child: _progress == null || _progress == 0.0
+                  ? const Text(
+                      'No goal set',
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0),
+                    )
+                  : CircularPercentIndicator(
+                      radius: 65.0,
+                      lineWidth: 8.0,
+                      animation: true,
+                      percent: _progress > 1.0 ? 1.0 : _progress, // Ensure the percent does not exceed 100%
+                      center: Text(
+                        _progress > 1.0 
+                          ? "Limit Exceeded" 
+                          : "${(_progress * 100).toStringAsFixed(1)}%",
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15.0),
+                      ),
+                      footer: const Text(
+                        "of your limit",
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17.0),
+                      ),
+                      circularStrokeCap: CircularStrokeCap.round,
+                      progressColor: _progress > 1.0 ? Colors.red : Colors.green, // Change color to red if limit is exceeded
+                    ),
               ),
             ),
 
 
           const Padding(
-            padding: EdgeInsets.only(top: 15.0), // Adjust this value to move the text down
+            padding: EdgeInsets.only(top: 5.0), 
             child: Text(
               'Select date to log a new trip',
               style: TextStyle(
@@ -222,7 +242,7 @@ class _WelcomePageState extends State<WelcomePage> {
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   return Expanded(
-                    flex: 5,
+                    flex: 7,
                     child: CalendarCarousel(
                       onDayPressed: (DateTime date, List<dynamic> events) {
                         var trip = snapshot.data!.firstWhere(
@@ -245,7 +265,7 @@ class _WelcomePageState extends State<WelcomePage> {
                       ),
                       thisMonthDayBorderColor: Colors.grey,
                       weekFormat: false,
-                      height: 420.0,
+                      height: 380.0,
                       selectedDateTime: DateTime.now(),
                       daysHaveCircularBorder: false,
                       markedDatesMap: EventList<Event>(
@@ -306,7 +326,7 @@ class _WelcomePageState extends State<WelcomePage> {
             case 1:
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => InfoPage(userId: widget.userId,)),
+                MaterialPageRoute(builder: (context) => const InfoPageBasic()),
               );
               break;
             case 2:

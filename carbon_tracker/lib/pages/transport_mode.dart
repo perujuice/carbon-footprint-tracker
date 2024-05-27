@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'locations_input.dart';
 import 'login_page.dart';
 import 'help_page.dart';
-import 'info_page.dart';
+import 'info_page_basic.dart';
 
 
 class ModePage extends StatefulWidget {
@@ -86,7 +86,7 @@ Widget build(BuildContext context) {
           case 0:
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => InfoPage(userId: widget.userId,)),
+              MaterialPageRoute(builder: (context) => const InfoPageBasic()),
             );
             break;
           case 1:

@@ -23,7 +23,7 @@ class _SettingsPageState extends State<SettingsPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
-              'Suck a dick :)',
+              'Change something here!',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
