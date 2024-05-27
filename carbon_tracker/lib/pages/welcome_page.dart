@@ -39,8 +39,20 @@ class _WelcomePageState extends State<WelcomePage> {
     super.initState();
     tripDates = fetchTripData();
     totalCO2OutputFuture = fetchTotalCO2Output();
-    goalFuture = fetchGoal(); 
+    goalFuture = fetchGoal();
+    calculateProgress();
   }
+
+
+
+  void calculateProgress() async {
+    double totalCO2Output = await totalCO2OutputFuture;
+    double goal = await goalFuture;
+    setState(() {
+      _progress = totalCO2Output / goal;
+    });
+  }
+
 
   Future<List<Map<String, dynamic>>> fetchTripData() async {
     final response = await http.get(
@@ -72,10 +84,6 @@ class _WelcomePageState extends State<WelcomePage> {
 
     if (response.statusCode == 200) {
       double totalCO2Output = double.parse(response.body);
-      double goal = await goalFuture;
-      setState(() {
-        _progress = totalCO2Output / goal;
-      });
       return totalCO2Output;
     } else {
       throw Exception('Failed to fetch total CO2 output');

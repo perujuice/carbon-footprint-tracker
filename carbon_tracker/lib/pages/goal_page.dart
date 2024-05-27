@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:intl/intl.dart';
+import 'welcome_page.dart';
 
 class GoalPage extends StatefulWidget {
   final int userId;
@@ -53,6 +54,10 @@ class _GoalPageState extends State<GoalPage> {
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Goal set successfully')),
+        );
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => WelcomePage(title: 'Welcome User!', userId: widget.userId!)),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
