@@ -23,8 +23,8 @@ import org.springframework.http.MediaType;
 public class DistanceCalculator {
 
 
-    private static final String API_KEY = "AIzaSyDS2lRR6DHeikTjmx9QNykRVkguSzanfSg";
-    private static final String carbon_API_KEY = "SFbhbVU5vEAQaKuBqAdXg";
+    private static final String API_KEY = "InputSOMEAPI"; //Removed the API keys for privacy.
+    private static final String carbon_API_KEY = " ";
 
 
     // CO2 emission factors in kg per kilometer

@@ -227,7 +227,7 @@ class _GoalPageState extends State<GoalPage> {
                     const SizedBox(height: 30),
                     const Center(
                       child: Text(
-                        "You're 23% above the national average.",
+                        "You're 23% below the world average.",
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,

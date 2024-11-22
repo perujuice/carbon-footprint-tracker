@@ -213,7 +213,7 @@ class _WelcomePageState extends State<WelcomePage> {
                       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0),
                     )
                   : CircularPercentIndicator(
-                      radius: 65.0,
+                      radius: 55.0,
                       lineWidth: 8.0,
                       animation: true,
                       percent: _progress > 1.0 ? 1.0 : _progress, // Ensure the percent does not exceed 100%
@@ -223,10 +223,6 @@ class _WelcomePageState extends State<WelcomePage> {
                           : "${(_progress * 100).toStringAsFixed(1)}%",
                         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15.0),
                       ),
-                      footer: const Text(
-                        "of your limit",
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17.0),
-                      ),
                       circularStrokeCap: CircularStrokeCap.round,
                       progressColor: _progress > 1.0 ? Colors.red : Colors.green, // Change color to red if limit is exceeded
                     ),
@@ -235,7 +231,7 @@ class _WelcomePageState extends State<WelcomePage> {
 
 
           const Padding(
-            padding: EdgeInsets.only(top: 5.0), 
+            padding: EdgeInsets.only(top: 1.0), 
             child: Text(
               'Select date to log a new trip',
               style: TextStyle(
@@ -244,13 +240,13 @@ class _WelcomePageState extends State<WelcomePage> {
               ),
             ),
           ),
-            const SizedBox(height: 5),
+            const SizedBox(height: 1),
             FutureBuilder<List<Map<String, dynamic>>>(
               future: tripDates,
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   return Expanded(
-                    flex: 7,
+                    flex: 8,
                     child: CalendarCarousel(
                       onDayPressed: (DateTime date, List<dynamic> events) {
                         var trip = snapshot.data!.firstWhere(
@@ -273,7 +269,7 @@ class _WelcomePageState extends State<WelcomePage> {
                       ),
                       thisMonthDayBorderColor: Colors.grey,
                       weekFormat: false,
-                      height: 380.0,
+                      height: 360.0,
                       selectedDateTime: DateTime.now(),
                       daysHaveCircularBorder: false,
                       markedDatesMap: EventList<Event>(
